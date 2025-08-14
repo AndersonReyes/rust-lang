@@ -1,8 +1,6 @@
 pub mod bit_vector;
 pub mod calculus;
-pub mod huffman_codes;
-pub mod merge_sort;
-pub mod search;
+pub mod graphs;
 
 pub fn add(left: u64, right: u64) -> u64 {
     left + right
