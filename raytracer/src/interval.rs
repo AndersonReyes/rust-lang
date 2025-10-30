@@ -1,6 +1,7 @@
+#[derive(Debug)]
 pub struct Interval {
-    min: f64,
-    max: f64,
+    pub min: f64,
+    pub max: f64,
 }
 
 impl Interval {
@@ -24,7 +25,13 @@ impl Interval {
 
     /// clamp x in the range of this interval
     pub fn clamp(&self, x: f64) -> f64 {
-        self.min.max(x).min(self.max)
+        if x < self.min {
+            self.min
+        } else if x > self.max {
+            self.max
+        } else {
+            x
+        }
     }
 }
 

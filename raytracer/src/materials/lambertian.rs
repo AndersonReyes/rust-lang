@@ -1,13 +1,31 @@
-use crate::geometry::intersectable::HitRecord;
-use crate::math::ray::Ray;
-use crate::{image::color::Color, materials::material::Material};
+use crate::math::{Normal3, Point3};
+use crate::math::{ray::Ray, utils};
+use crate::{
+    image::color::Color,
+    materials::material::{Material, MaterialResult},
+};
 
 pub struct Lambertian {
     albedo: Color,
 }
 
+impl Lambertian {
+    pub fn new(albedo: Color) -> Self {
+        Self { albedo }
+    }
+}
+
 impl Material for Lambertian {
-    fn get_color(ray: &Ray, hit_record: &HitRecord) -> Option<Color> {
-        let direction = hit_record.normal + random_unit_vector();
+    fn get_color(&self, ray: &Ray, normal: &Normal3, hit_point: &Point3) -> Option<MaterialResult> {
+        let mut direction = normal + utils::random_unit_vector();
+
+        if utils::near_zero_vector(&direction) {
+            direction = normal.clone_owned();
+        }
+
+        Some(MaterialResult::new(
+            self.albedo,
+            Ray::new(hit_point.clone_owned(), direction),
+        ))
     }
 }
