@@ -1,18 +1,18 @@
 use crate::{
     geometry::intersectable::{HitRecord, Intersectable},
     interval::Interval,
-    materials::material::{Material, MaterialResult},
+    materials::{material::Material, result::MaterialResult},
     math::{Vector3f, ray::Ray},
 };
 
 pub struct Sphere<'a> {
     pub radius: f64,
     pub center: Vector3f,
-    pub material: &'a Box<dyn Material>,
+    pub material: &'a Material,
 }
 
 impl<'a> Sphere<'a> {
-    pub fn new(radius: f64, center: Vector3f, material: &'a Box<dyn Material>) -> Self {
+    pub fn new(radius: f64, center: Vector3f, material: &'a Material) -> Self {
         Self {
             radius,
             center,

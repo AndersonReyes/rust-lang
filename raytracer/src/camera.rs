@@ -1,5 +1,5 @@
 use crate::{
-    geometry::{intersectable::Intersectable, intersectable_group::IntersectableGroup},
+    geometry::{geometry::Geometry, intersectable},
     image::color::Color,
     interval::Interval,
     math::{Vector3f, ray::Ray},
@@ -70,7 +70,7 @@ impl Camera {
     }
 
     // takes a one pixel step and sends a ray into the screen.
-    pub fn ray_step(&mut self, scene: &IntersectableGroup, color_data: &mut Vec<Vec<Color>>) {
+    pub fn ray_step(&mut self, scene: &Vec<Geometry>, color_data: &mut Vec<Vec<Color>>) {
         if !self.is_running {
             return;
         }
@@ -81,8 +81,7 @@ impl Camera {
 
         let ray_direction = pixel_center - self.camera_center;
         let ray = Ray::new(self.camera_center, ray_direction);
-        let color = scene
-            .intersect(&ray, Interval::new(0.001, f64::INFINITY))
+        let color = intersectable::intersect(&scene, &ray, Interval::new(0.001, f64::INFINITY))
             .map(|hit| hit.color)
             .unwrap_or(random_color(&ray));
 

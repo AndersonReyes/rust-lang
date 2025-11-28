@@ -1,9 +1,6 @@
 use crate::math::{Normal3, Point3};
 use crate::math::{ray::Ray, utils};
-use crate::{
-    image::color::Color,
-    materials::material::{Material, MaterialResult},
-};
+use crate::{image::color::Color, materials::result::MaterialResult};
 
 pub struct Lambertian {
     albedo: Color,
@@ -13,10 +10,13 @@ impl Lambertian {
     pub fn new(albedo: Color) -> Self {
         Self { albedo }
     }
-}
 
-impl Material for Lambertian {
-    fn get_color(&self, ray: &Ray, normal: &Normal3, hit_point: &Point3) -> Option<MaterialResult> {
+    pub fn get_color(
+        &self,
+        ray: &Ray,
+        normal: &Normal3,
+        hit_point: &Point3,
+    ) -> Option<MaterialResult> {
         let mut direction = normal + utils::random_unit_vector();
 
         if utils::near_zero_vector(&direction) {
