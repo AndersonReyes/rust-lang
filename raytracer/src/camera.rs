@@ -1,6 +1,8 @@
+use std::{fs::File, io::Write};
+
 use crate::{
     geometry::{geometry::Geometry, intersectable},
-    image::color::Color,
+    image::color::{Color, as_u8},
     interval::Interval,
     math::{Vector3f, ray::Ray},
 };
@@ -67,6 +69,39 @@ impl Camera {
             step_height: 0,
             is_running: true,
         }
+    }
+
+    // takes a one pixel step and sends a ray into the screen.
+    pub fn render(&mut self, scene: &Vec<Geometry>, file: &mut File) -> std::io::Result<()> {
+        write!(file, "P3\n{} {}\n255\n", self.width, self.height)?;
+
+        for y in 0..self.height {
+            for x in 0..self.width {
+                let pixel_center: Vector3f = self.center_pixel_location
+                    + (self.pixel_delta_u * (x as f64))
+                    + (self.pixel_delta_v * (y as f64));
+
+                let ray_direction = pixel_center - self.camera_center;
+                let ray = Ray::new(self.camera_center, ray_direction);
+                let color =
+                    intersectable::intersect(&scene, &ray, Interval::new(0.001, f64::INFINITY))
+                        .map(|hit| hit.color)
+                        .unwrap_or(random_color(&ray));
+
+                write!(
+                    file,
+                    "{} {} {}\n",
+                    as_u8(color.x),
+                    as_u8(color.y),
+                    as_u8(color.z)
+                )?;
+            }
+
+            file.flush()?;
+        }
+
+        file.flush()?;
+        Ok(())
     }
 
     // takes a one pixel step and sends a ray into the screen.

@@ -5,42 +5,38 @@ extern crate nalgebra;
 
 use raytracer::{
     camera::Camera,
-    display::Display,
     geometry::{geometry::Geometry, sphere::Sphere},
-    image::color::{BLUE, Color},
+    image::color,
     materials::{lambertian::Lambertian, material::Material},
     math::Point3,
 };
 
-use std::error::Error;
+use std::fs::OpenOptions;
 
-use crate::image::color::BLACK;
-
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() -> std::io::Result<()> {
     println!("Hello, world!");
 
-    let mat: Material = Material::Lambertian(Lambertian::new(BLUE));
+    let mat: Material = Material::Lambertian(Lambertian::new(color::BLUE));
+    let mat2: Material = Material::Lambertian(Lambertian::new(color::GREEN));
 
     let mut camera = Camera::new(16.0 / 9.0, 1.0, 2.0, 400);
+    println!(
+        "Camera width and height: {} {}\n",
+        camera.width, camera.height
+    );
 
-    let mut display = Display::new(camera.width, camera.height);
+    let ground = Geometry::Sphere(Sphere::new(2.2, Point3::new(0.0, -2.7, -2.0), &mat2));
+    let sphere = Geometry::Sphere(Sphere::new(0.5, Point3::new(0.0, 0.0, -1.0), &mat));
 
-    let mut color_data: Vec<Vec<Color>> =
-        vec![vec![BLACK; camera.height as usize]; camera.width as usize];
+    let scene: Vec<Geometry> = vec![ground, sphere];
 
-    let scene: Vec<Geometry> = vec![Geometry::Sphere(Sphere::new(
-        0.5,
-        Point3::new(0.0, 0.0, -1.0),
-        &mat,
-    ))];
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .open("target/image.ppm")?;
 
-    while camera.is_running && display.is_running {
-        display.handle_quit();
-        camera.ray_step(&scene, &mut color_data);
-        display.update(&color_data);
-    }
-
-    display.wait_until_quit();
+    camera.render(&scene, &mut file)?;
 
     Ok(())
 }
