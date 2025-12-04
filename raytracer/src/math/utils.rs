@@ -3,11 +3,14 @@ use nalgebra::Vector3;
 use crate::math::Vector3f;
 use rand::prelude::*;
 
+pub fn random_double() -> f64 {
+    rand::random_range(-1.0..=1.0)
+}
+
 pub fn random_unit_vector() -> Vector3f {
-    let mut rng = rand::rng();
     loop {
         let v: Vector3f = Vector3::new(
-            rng.random_range(-1.0..=1.0),
+            rand::random_range(-1.0..=1.0),
             rand::random_range(-1.0..=1.0),
             rand::random_range(-1.0..=1.0),
         );

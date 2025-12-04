@@ -14,10 +14,11 @@ pub struct HitRecord {
     pub time: f64,
     /// if the object front facing or back facing
     pub is_front_face: bool,
+    pub ray: Ray,
 }
 
 impl HitRecord {
-    pub fn new(point: Point3, normal: Normal3, color: Color, time: f64, ray: &Ray) -> Self {
+    pub fn new(point: Point3, normal: Normal3, color: Color, time: f64, ray: Ray) -> Self {
         let is_front_face = ray.direction.dot(&normal) < 0.0;
         let norm = if is_front_face { normal } else { -normal };
 
@@ -27,6 +28,7 @@ impl HitRecord {
             color: color,
             time: time,
             is_front_face: is_front_face,
+            ray: ray,
         }
     }
 }

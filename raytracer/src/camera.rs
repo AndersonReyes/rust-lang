@@ -1,10 +1,12 @@
-use std::{fs::File, io::Write};
+use std::{array::from_fn, fs::File, io::Write};
+
+use rand::random_ratio;
 
 use crate::{
     geometry::{geometry::Geometry, intersectable},
-    image::color::{Color, as_u8},
+    image::color::{BLACK, Color, as_u8},
     interval::Interval,
-    math::{Vector3f, ray::Ray},
+    math::{Vector3f, ray::Ray, utils},
 };
 
 pub struct Camera {
@@ -12,14 +14,9 @@ pub struct Camera {
     center_pixel_location: Vector3f,
     pixel_delta_u: Vector3f,
     pixel_delta_v: Vector3f,
-    viewport_u: Vector3f,
-    viewport_v: Vector3f,
-    viewport_w: Vector3f,
     pub width: u32,
     pub height: u32,
-    step_width: u32,
-    step_height: u32,
-    pub is_running: bool,
+    samples_per_pixel: u16,
 }
 
 fn random_color(ray: &Ray) -> Color {
@@ -60,33 +57,63 @@ impl Camera {
             center_pixel_location,
             pixel_delta_u,
             pixel_delta_v,
-            viewport_u,
-            viewport_v,
-            viewport_w,
             width: image_width_int,
             height: image_height_int,
-            step_width: 0,
-            step_height: 0,
-            is_running: true,
+            samples_per_pixel: 100,
         }
     }
 
+    fn get_color(
+        &self,
+        depth: usize,
+        scene: &Vec<Geometry>,
+        ray: &Ray,
+        interval: Interval,
+    ) -> Color {
+        if depth <= 0 {
+            return BLACK;
+        }
+
+        if let Some(hit) = intersectable::intersect(&scene, &ray, interval.clone()) {
+            return hit.color.component_mul(&self.get_color(
+                depth - 1,
+                scene,
+                &hit.ray,
+                interval.clone(),
+            ));
+        } else {
+            random_color(&ray)
+        }
+    }
+
+    fn get_ray(&self, x: u32, y: u32) -> Ray {
+        let offset = Vector3f::new(
+            utils::random_double() - 0.5,
+            utils::random_double() - 0.5,
+            0.,
+        );
+
+        let pixel_sample = self.center_pixel_location
+            + ((f64::from(x) + offset.x) * self.pixel_delta_u)
+            + ((f64::from(y) + offset.y) * self.pixel_delta_v);
+
+        let ray_direction = pixel_sample - self.camera_center;
+
+        return Ray::new(self.camera_center, ray_direction);
+    }
+
     // takes a one pixel step and sends a ray into the screen.
-    pub fn render(&mut self, scene: &Vec<Geometry>, file: &mut File) -> std::io::Result<()> {
+    pub fn render(&self, scene: &Vec<Geometry>, file: &mut File) -> std::io::Result<()> {
         write!(file, "P3\n{} {}\n255\n", self.width, self.height)?;
 
         for y in 0..self.height {
             for x in 0..self.width {
-                let pixel_center: Vector3f = self.center_pixel_location
-                    + (self.pixel_delta_u * (x as f64))
-                    + (self.pixel_delta_v * (y as f64));
+                let mut color = BLACK;
 
-                let ray_direction = pixel_center - self.camera_center;
-                let ray = Ray::new(self.camera_center, ray_direction);
-                let color =
-                    intersectable::intersect(&scene, &ray, Interval::new(0.001, f64::INFINITY))
-                        .map(|hit| hit.color)
-                        .unwrap_or(random_color(&ray));
+                for _ in 0..self.samples_per_pixel {
+                    let ray = self.get_ray(x, y);
+                    color += self.get_color(100, &scene, &ray, Interval::new(0.001, f64::INFINITY));
+                }
 
                 write!(
                     file,
@@ -102,32 +129,5 @@ impl Camera {
 
         file.flush()?;
         Ok(())
-    }
-
-    // takes a one pixel step and sends a ray into the screen.
-    pub fn ray_step(&mut self, scene: &Vec<Geometry>, color_data: &mut Vec<Vec<Color>>) {
-        if !self.is_running {
-            return;
-        }
-
-        let pixel_center: Vector3f = self.center_pixel_location
-            + (self.pixel_delta_u * (self.step_width as f64))
-            + (self.pixel_delta_v * (self.step_height as f64));
-
-        let ray_direction = pixel_center - self.camera_center;
-        let ray = Ray::new(self.camera_center, ray_direction);
-        let color = intersectable::intersect(&scene, &ray, Interval::new(0.001, f64::INFINITY))
-            .map(|hit| hit.color)
-            .unwrap_or(random_color(&ray));
-
-        // write_color_ppm(&color, &mut file)?;
-        color_data[self.step_height as usize][self.step_width as usize] = color;
-
-        self.step_width += 1;
-        self.step_height += 1;
-
-        if self.step_width >= self.width || self.step_height >= self.height {
-            self.is_running = false;
-        }
     }
 }

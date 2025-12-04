@@ -13,7 +13,7 @@ impl Lambertian {
 
     pub fn get_color(
         &self,
-        ray: &Ray,
+        _ray: &Ray,
         normal: &Normal3,
         hit_point: &Point3,
     ) -> Option<MaterialResult> {

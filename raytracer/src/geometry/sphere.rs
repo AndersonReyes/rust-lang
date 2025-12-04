@@ -63,7 +63,7 @@ impl Intersectable for Sphere<'_> {
             normal,
             mat_result.attenuation,
             time,
-            ray,
+            mat_result.scattered_ray,
         ))
     }
 }
