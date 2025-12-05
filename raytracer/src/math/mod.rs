@@ -1,8 +1,9 @@
 pub mod ray;
 pub mod utils;
 
-pub use crate::nalgebra::Vector3;
+pub mod vector3;
 
-pub type Point3 = Vector3<f64>;
-pub type Normal3 = Vector3<f64>;
-pub type Vector3f = Vector3<f64>;
+pub use ray::Ray;
+pub use vector3::Vector3f;
+pub type Point3f = vector3::Vector3f;
+pub type Normal3f = vector3::Vector3f;

@@ -1,13 +1,13 @@
 use crate::geometry::geometry::Geometry;
 use crate::image::color::Color;
 use crate::interval::Interval;
-use crate::math::{Normal3, Point3, ray::Ray};
+use crate::math::{Normal3f, Point3f, Ray};
 
 pub struct HitRecord {
     /// point where intersection happend
-    pub point: Point3,
+    pub point: Point3f,
     /// normal at intersection point
-    pub normal: Normal3,
+    pub normal: Normal3f,
     /// color at intersection point
     pub color: Color,
     /// time of intersection
@@ -18,7 +18,7 @@ pub struct HitRecord {
 }
 
 impl HitRecord {
-    pub fn new(point: Point3, normal: Normal3, color: Color, time: f64, ray: Ray) -> Self {
+    pub fn new(point: Point3f, normal: Normal3f, color: Color, time: f64, ray: Ray) -> Self {
         let is_front_face = ray.direction.dot(&normal) < 0.0;
         let norm = if is_front_face { normal } else { -normal };
 

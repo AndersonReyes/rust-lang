@@ -14,7 +14,7 @@ impl Ray {
 
     /// Get the ray location at time t
     pub fn at(self: &Self, t: f64) -> Vector3f {
-        self.origin.add(self.direction.scale(t))
+        self.origin.add(self.direction * t)
     }
 }
 
