@@ -1,8 +1,6 @@
-use nalgebra::SquareMatrix;
-
 use crate::{
     geometry::intersectable::{HitRecord, Intersectable},
-    interval::{self, Interval},
+    interval::Interval,
     materials::{material::Material, result::MaterialResult},
     math::{Vector3f, ray::Ray},
 };

@@ -1,3 +1,3 @@
 pub mod color;
 
-pub use color::Color;
+pub use color::{BLACK, BLUE, Color, GREEN, RED, as_u8};

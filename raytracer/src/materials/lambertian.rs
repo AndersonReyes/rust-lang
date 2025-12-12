@@ -1,5 +1,5 @@
-use crate::math::{Normal3, Point3};
-use crate::math::{ray::Ray, utils};
+use crate::math::utils;
+use crate::math::{Normal3f, Point3f, Ray, Vector3f};
 use crate::{image::color::Color, materials::result::MaterialResult};
 
 pub struct Lambertian {
@@ -14,18 +14,18 @@ impl Lambertian {
     pub fn get_color(
         &self,
         _ray: &Ray,
-        normal: &Normal3,
-        hit_point: &Point3,
+        normal: &Normal3f,
+        hit_point: &Point3f,
     ) -> Option<MaterialResult> {
-        let mut direction = normal + utils::random_unit_vector();
+        let mut direction = Vector3f::random_unit_vector() + *normal;
 
         if utils::near_zero_vector(&direction) {
-            direction = normal.clone_owned();
+            direction = normal.to_owned();
         }
 
         Some(MaterialResult::new(
             self.albedo,
-            Ray::new(hit_point.clone_owned(), direction),
+            Ray::new(hit_point.to_owned(), direction),
         ))
     }
 }

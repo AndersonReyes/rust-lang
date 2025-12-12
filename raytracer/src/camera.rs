@@ -1,12 +1,10 @@
-use std::{array::from_fn, fs::File, io::Write};
-
-use rand::random_ratio;
+use std::{fs::File, io::Write};
 
 use crate::{
     geometry::{geometry::Geometry, intersectable},
-    image::color::{BLACK, Color, as_u8},
+    image::{BLACK, Color, as_u8},
     interval::Interval,
-    math::{Vector3f, ray::Ray, utils},
+    math::{Ray, Vector3f, utils},
 };
 
 pub struct Camera {
@@ -50,7 +48,7 @@ impl Camera {
             - Vector3f::new(0.0, 0.0, focal_length)
             - viewport_u / 2.0
             - viewport_v / 2.0;
-        let center_pixel_location: Vector3f = viewport_w + 0.5 * (pixel_delta_u + pixel_delta_v);
+        let center_pixel_location: Vector3f = (viewport_w + 0.5) * (pixel_delta_u + pixel_delta_v);
 
         Self {
             camera_center,
@@ -75,12 +73,7 @@ impl Camera {
         }
 
         if let Some(hit) = intersectable::intersect(&scene, &ray, interval.clone()) {
-            return hit.color.component_mul(&self.get_color(
-                depth - 1,
-                scene,
-                &hit.ray,
-                interval.clone(),
-            ));
+            return hit.color * self.get_color(depth - 1, scene, &hit.ray, interval.clone());
         } else {
             random_color(&ray)
         }
@@ -94,8 +87,8 @@ impl Camera {
         );
 
         let pixel_sample = self.center_pixel_location
-            + ((f64::from(x) + offset.x) * self.pixel_delta_u)
-            + ((f64::from(y) + offset.y) * self.pixel_delta_v);
+            + (self.pixel_delta_u * (offset.x + f64::from(x)))
+            + (self.pixel_delta_v * (offset.y + f64::from(y)));
 
         let ray_direction = pixel_sample - self.camera_center;
 
@@ -112,7 +105,8 @@ impl Camera {
 
                 for _ in 0..self.samples_per_pixel {
                     let ray = self.get_ray(x, y);
-                    color += self.get_color(100, &scene, &ray, Interval::new(0.001, f64::INFINITY));
+                    color = color
+                        + self.get_color(100, &scene, &ray, Interval::new(0.001, f64::INFINITY));
                 }
 
                 write!(

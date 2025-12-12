@@ -40,6 +40,21 @@ impl Vector3f {
     pub fn dot(&self, other: &Self) -> f64 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
+
+    pub fn random_unit_vector() -> Vector3f {
+        loop {
+            let v: Vector3f = Vector3f::new(
+                rand::random_range(-1.0..=1.0),
+                rand::random_range(-1.0..=1.0),
+                rand::random_range(-1.0..=1.0),
+            );
+
+            let len_squared = v.norm_squared();
+            if 1e-160 < len_squared && len_squared <= 1.0 {
+                return v.normalize();
+            }
+        }
+    }
 }
 
 impl Add for Vector3f {
@@ -47,6 +62,21 @@ impl Add for Vector3f {
 
     fn add(self, rhs: Self) -> Self::Output {
         Vector3f::new(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z)
+    }
+}
+impl Add<f64> for Vector3f {
+    type Output = Self;
+
+    fn add(self, rhs: f64) -> Self::Output {
+        Vector3f::new(self.x + rhs, self.y + rhs, self.z + rhs)
+    }
+}
+
+impl Mul for Vector3f {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        Self::Output::new(self.x * rhs.x, self.y * rhs.y, self.z * rhs.z)
     }
 }
 
@@ -63,6 +93,30 @@ impl Neg for Vector3f {
 
     fn neg(self) -> Self::Output {
         Self::Output::new(-self.x, -self.y, -self.z)
+    }
+}
+
+impl Sub for Vector3f {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self::Output::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
+    }
+}
+
+impl Div for Vector3f {
+    type Output = Self;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        Self::Output::new(self.x / rhs.x, self.y / rhs.y, self.z / rhs.z)
+    }
+}
+
+impl Div<f64> for Vector3f {
+    type Output = Self;
+
+    fn div(self, rhs: f64) -> Self::Output {
+        Self::Output::new(self.x / rhs, self.y / rhs, self.z / rhs)
     }
 }
 
