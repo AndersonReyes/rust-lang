@@ -1,4 +1,3 @@
-use crate::geometry::geometry::Geometry;
 use crate::image::color::Color;
 use crate::interval::Interval;
 use crate::math::{Normal3f, Point3f, Ray};
@@ -36,27 +35,28 @@ impl HitRecord {
 pub trait Intersectable {
     fn intersect(&self, ray: &Ray, interval: Interval) -> Option<HitRecord>;
 }
+//
+//fn intersect_obj(obj: &Geometry, ray: &Ray, interval: Interval) -> Option<HitRecord> {
+//    match obj {
+//        Geometry::Sphere(s) => s.intersect(ray, interval),
+//    }
+//}
+//
+//pub fn intersect(
+//    items: &Vec<Geometry>,
+//    ray: &Ray,
+//    interval: Interval,
+//) -> Option<super::intersectable::HitRecord> {
+//    let mut closest: Option<HitRecord> = None;
+//    let mut closest_time = interval.max;
+//
+//    for obj in items.iter() {
+//        if let Some(hit) = intersect_obj(obj, ray, Interval::new(interval.min, closest_time)) {
+//            closest_time = hit.time;
+//            closest = Some(hit);
+//        }
+//    }
+//
+//    closest
+//}
 
-fn intersect_obj(obj: &Geometry, ray: &Ray, interval: Interval) -> Option<HitRecord> {
-    match obj {
-        Geometry::Sphere(s) => s.intersect(ray, interval),
-    }
-}
-
-pub fn intersect(
-    items: &Vec<Geometry>,
-    ray: &Ray,
-    interval: Interval,
-) -> Option<super::intersectable::HitRecord> {
-    let mut closest: Option<HitRecord> = None;
-    let mut closest_time = interval.max;
-
-    for obj in items.iter() {
-        if let Some(hit) = intersect_obj(obj, ray, Interval::new(interval.min, closest_time)) {
-            closest_time = hit.time;
-            closest = Some(hit);
-        }
-    }
-
-    closest
-}

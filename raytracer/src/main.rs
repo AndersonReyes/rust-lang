@@ -2,31 +2,17 @@ mod image;
 mod math;
 
 use raytracer::{
-    camera::Camera,
-    geometry::{geometry::Geometry, sphere::Sphere},
-    image::color,
-    materials::{lambertian::Lambertian, material::Material},
+    image::{Color, as_u8},
     math::Point3f,
 };
 
-use std::fs::OpenOptions;
+use std::{fs::OpenOptions, io::Write};
 
 fn main() -> std::io::Result<()> {
     println!("Hello, world!");
 
-    let mat: Material = Material::Lambertian(Lambertian::new(color::BLUE));
-    let mat2: Material = Material::Lambertian(Lambertian::new(color::GREEN));
-
-    let camera = Camera::new(16.0 / 9.0, 1.0, 2.0, 400);
-    println!(
-        "Camera width and height: {} {}\n",
-        camera.width, camera.height
-    );
-
-    let ground = Geometry::Sphere(Sphere::new(2.2, Point3f::new(0.0, -2.7, -2.0), &mat2));
-    let sphere = Geometry::Sphere(Sphere::new(0.5, Point3f::new(0.0, 0.0, -1.0), &mat));
-
-    let scene: Vec<Geometry> = vec![ground, sphere];
+    let image_height: u16 = 1024;
+    let image_width: u16 = 1024;
 
     let mut file = OpenOptions::new()
         .write(true)
@@ -34,7 +20,26 @@ fn main() -> std::io::Result<()> {
         .truncate(true)
         .open("target/image.ppm")?;
 
-    camera.render(&scene, &mut file)?;
+    write!(file, "P3\n{} {}\n255\n", image_width, image_height)?;
+
+    for j in 0..image_height {
+        for i in 0..image_width {
+            let red: f64 = f64::from(i) / f64::from(image_width - 1);
+            let green: f64 = f64::from(j) / f64::from(image_height - 1);
+
+            let color = Color::new(red, green, 0.);
+            // println!("Color: {:?}", color);
+            write!(
+                file,
+                "{} {} {}\n",
+                as_u8(color.x),
+                as_u8(color.y),
+                as_u8(color.z)
+            )?;
+        }
+    }
+
+    file.flush()?;
 
     Ok(())
 }
