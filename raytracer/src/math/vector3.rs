@@ -20,8 +20,12 @@ impl PartialEq for Vector3f {
 impl Eq for Vector3f {}
 
 impl Vector3f {
-    pub const fn new(x: f64, y: f64, z: f64) -> Self {
-        Self { x, y, z }
+    pub fn new<T: Into<f64>>(x: T, y: T, z: T) -> Self {
+        Self {
+            x: x.into(),
+            y: y.into(),
+            z: z.into(),
+        }
     }
 
     pub fn norm_squared(&self) -> f64 {
