@@ -8,7 +8,7 @@ pub struct HitRecord {
     /// normal at intersection point
     pub normal: Normal3f,
     /// color at intersection point
-    pub color: Color,
+    pub color: Color<f64>,
     /// time of intersection
     pub time: f64,
     /// if the object front facing or back facing
@@ -17,7 +17,7 @@ pub struct HitRecord {
 }
 
 impl HitRecord {
-    pub fn new(point: Point3f, normal: Normal3f, color: Color, time: f64, ray: Ray) -> Self {
+    pub fn new(point: Point3f, normal: Normal3f, color: Color<f64>, time: f64, ray: Ray) -> Self {
         let is_front_face = ray.direction.dot(&normal) < 0.0;
         let norm = if is_front_face { normal } else { -normal };
 

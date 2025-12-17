@@ -1,3 +1,4 @@
 pub mod color;
+pub mod ppm;
 
-pub use color::{BLACK, BLUE, Color, GREEN, RED, as_u8};
+pub use color::{BLACK, BLUE, Color, GREEN, RED};

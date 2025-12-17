@@ -1,14 +1,32 @@
-use crate::math::Vector3f;
-
-// TODO: should I just wrap the vector class to hide scale between [0,1] or [0,255]?
-/// Color as a unit vector
-pub type Color = Vector3f;
-
-pub const RED: Color = Color::new(1.0, 0.0, 0.0);
-pub const BLUE: Color = Color::new(0.0, 0.0, 1.0);
-pub const BLACK: Color = Color::new(0.0, 0.0, 0.0);
-pub const GREEN: Color = Color::new(0.0, 1.0, 0.0);
-
-pub fn as_u8(v: f64) -> u8 {
-    (255.999 * v).floor() as u8
+pub struct Color<T> {
+    pub r: T,
+    pub g: T,
+    pub b: T,
 }
+
+/// represents color where values range from 0.0 to 1.0
+pub type ColorNormalized = Color<f64>;
+/// represents color where values range from 0 to 255
+pub type ColorU8 = Color<u8>;
+
+impl<T> Color<T> {
+    pub const fn new(r: T, g: T, b: T) -> Self {
+        Self { r, g, b }
+    }
+
+    pub fn as_u8(&self) -> Color<u8>
+    where
+        T: Into<f64> + Clone,
+    {
+        Color::new(
+            (255.999 * self.r.clone().into()).floor() as u8,
+            (255.999 * self.g.clone().into()).floor() as u8,
+            (255.999 * self.b.clone().into()).floor() as u8,
+        )
+    }
+}
+
+pub const RED: ColorNormalized = Color::new(1.0, 0.0, 0.0);
+pub const BLUE: ColorNormalized = Color::new(0.0, 0.0, 1.0);
+pub const BLACK: ColorNormalized = Color::new(0.0, 0.0, 0.0);
+pub const GREEN: ColorNormalized = Color::new(0.0, 1.0, 0.0);

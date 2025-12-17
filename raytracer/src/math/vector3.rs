@@ -50,6 +50,7 @@ impl Vector3f {
             );
 
             let len_squared = v.norm_squared();
+
             if 1e-160 < len_squared && len_squared <= 1.0 {
                 return v.normalize();
             }
@@ -127,6 +128,49 @@ mod tests {
     #[test]
     fn add_two_vectors() {
         let a = Vector3f::new(1.0, 2.0, -3.0);
-        assert_eq!(a + a, Vector3f::new(2., 4., 0.));
+        assert_eq!(a + a, Vector3f::new(2., 4., -6.0));
+    }
+
+    #[test]
+    fn norm_squared() {
+        let a = Vector3f::new(1.0, 2.0, -3.0);
+        assert_eq!(a.norm_squared(), 14.0);
+    }
+
+    #[test]
+    fn norm() {
+        let a = Vector3f::new(1.0, 2.0, -3.0);
+        assert_eq!(a.norm(), 14.0_f64.sqrt());
+    }
+
+    #[test]
+    fn dot() {
+        let a = Vector3f::new(1.0, 2.0, -3.0);
+        let b = Vector3f::new(2.0, 3.0, 4.0);
+        assert_eq!(a.dot(&b), -4.0);
+    }
+
+    #[test]
+    fn normalize() {
+        let a = Vector3f::new(1.0, 2.0, -3.0);
+        let denom = 14.0_f64.sqrt();
+        assert_eq!(
+            a.normalize(),
+            Vector3f::new(a.x / denom, a.y / denom, a.z / denom)
+        );
+    }
+
+    #[test]
+    fn equals() {
+        let a = Vector3f::new(1.0, 2.0, -3.0);
+        assert_eq!(a, a);
+        assert_eq!(a == a, true);
+        assert_eq!(a.eq(&a), true);
+    }
+
+    #[test]
+    fn random_unit_vector() {
+        let a = Vector3f::random_unit_vector();
+        assert_eq!(utils::is_close_to(&a.norm(), &1.0), true);
     }
 }
