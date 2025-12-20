@@ -2,7 +2,7 @@ use std::{fs::File, io};
 
 use crate::{
     geometry::intersectable::Intersectable,
-    image::{Color, color, ppm},
+    image::{Color, ppm},
     interval::Interval,
     math::{Ray, Vector3f},
     shapes::shapes::Shapes,
@@ -70,16 +70,14 @@ impl Camera {
                 let ray = Ray::new(self.position, ray_direction);
 
                 let mut closest_so_far = interval.max;
-                let mut color = color::BLACK;
+                let mut color = ray_color(&ray);
 
                 for obj in scene.iter() {
-                    color = if let Some(hit_record) =
+                    if let Some(hit_record) =
                         obj.intersect(&ray, Interval::new(interval.min, closest_so_far))
                     {
                         closest_so_far = hit_record.time;
-                        hit_record.color
-                    } else {
-                        ray_color(&ray)
+                        color = hit_record.color
                     };
                 }
 

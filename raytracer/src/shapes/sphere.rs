@@ -1,17 +1,22 @@
 use crate::{
     geometry::intersectable::{HitRecord, Intersectable},
-    image::color,
+    image::color::Colorf64,
     math::Vector3f,
 };
 
 pub struct Sphere {
     radius: f64,
     position: Vector3f,
+    color: Colorf64,
 }
 
 impl Sphere {
-    pub fn new(radius: f64, position: Vector3f) -> Self {
-        Self { radius, position }
+    pub fn new(radius: f64, position: Vector3f, color: Colorf64) -> Self {
+        Self {
+            radius,
+            position,
+            color,
+        }
     }
 }
 
@@ -44,7 +49,7 @@ impl Intersectable for Sphere {
             Some(HitRecord::new(
                 hit_point,
                 normal,
-                color::RED,
+                self.color.clone() * 0.5 + normal,
                 root,
                 ray.clone().into(),
             ))

@@ -1,5 +1,8 @@
 use std::ops::{Add, Mul};
 
+use crate::math::Vector3f;
+
+#[derive(Debug, Clone, Copy)]
 pub struct Color<T> {
     pub r: T,
     pub g: T,
@@ -45,14 +48,6 @@ impl<T: Add<T, Output = T>> Add<Color<T>> for Color<T> {
     }
 }
 
-//impl<T: Add<f64, Output = T>> Add<Color<T>> for f64 {
-//    type Output = Color<T>;
-//
-//    fn add(self, rhs: Color<T>) -> Self::Output {
-//        rhs.add(self)
-//    }
-//}
-
 impl<T: Mul<f64, Output = T>> Mul<f64> for Color<T> {
     type Output = Color<T>;
 
@@ -61,12 +56,23 @@ impl<T: Mul<f64, Output = T>> Mul<f64> for Color<T> {
     }
 }
 
-//impl<T: Mul<f64, Output = T>> Mul<Color<T>> for f64 {
-//    type Output = Color<T>;
-//    fn mul(self, rhs: Color<T>) -> Self::Output {
-//        rhs.mul(self)
-//    }
-//}
+impl<T: Add<f64, Output = f64>> Add<Vector3f> for Color<T> {
+    type Output = Color<f64>;
+
+    fn add(self, rhs: Vector3f) -> Self::Output {
+        Self::Output::new(self.r + rhs.x, self.g + rhs.y, self.b + rhs.z)
+    }
+}
+
+impl From<Vector3f> for Color<f64> {
+    fn from(value: Vector3f) -> Self {
+        Self {
+            r: value.x,
+            g: value.y,
+            b: value.z,
+        }
+    }
+}
 
 pub const RED: ColorNormalized = Color::new(1.0, 0.0, 0.0);
 pub const BLUE: ColorNormalized = Color::new(0.0, 0.0, 1.0);
