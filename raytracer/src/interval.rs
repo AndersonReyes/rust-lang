@@ -37,3 +37,4 @@ impl Interval {
 
 pub const EMPTY: Interval = Interval::new(f64::INFINITY, f64::NEG_INFINITY);
 pub const UNIVERSE: Interval = Interval::new(f64::NEG_INFINITY, f64::INFINITY);
+pub const UNIT: Interval = Interval::new(0.0, 1.0);

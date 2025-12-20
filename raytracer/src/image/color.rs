@@ -1,6 +1,6 @@
 use std::ops::{Add, Mul};
 
-use crate::math::Vector3f;
+use crate::{interval::UNIT, math::Vector3f};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Color<T> {
@@ -25,9 +25,9 @@ impl<T> Color<T> {
         T: Into<f64> + Clone,
     {
         Color::new(
-            (255.999 * self.r.clone().into()).floor() as u8,
-            (255.999 * self.g.clone().into()).floor() as u8,
-            (255.999 * self.b.clone().into()).floor() as u8,
+            (256.0 * UNIT.clamp(self.r.clone().into())) as u8,
+            (256.0 * UNIT.clamp(self.g.clone().into())) as u8,
+            (256.0 * UNIT.clamp(self.b.clone().into())) as u8,
         )
     }
 }

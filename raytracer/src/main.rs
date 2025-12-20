@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
 mod image;
+mod interval;
 mod math;
 
 use raytracer::{
