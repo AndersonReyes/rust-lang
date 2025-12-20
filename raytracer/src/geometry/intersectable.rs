@@ -59,4 +59,3 @@ pub trait Intersectable {
 //
 //    closest
 //}
-
