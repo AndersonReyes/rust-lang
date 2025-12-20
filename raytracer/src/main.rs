@@ -4,8 +4,11 @@ mod image;
 mod math;
 
 use raytracer::{
+    geometry::intersectable::Intersectable,
     image::{Color, ppm},
+    interval::Interval,
     math::{Ray, Vector3f},
+    shapes::{shapes::Shapes, sphere::Sphere},
 };
 
 use std::{fs::OpenOptions, io::Write};
@@ -45,6 +48,10 @@ fn main() -> std::io::Result<()> {
         .truncate(true)
         .open("target/image.ppm")?;
 
+    let sphere = Sphere::new(0.5, Vector3f::new(0.0, 0.0, -1.0));
+
+    // let scene = Shapes::Sphere(sphere);
+
     ppm::write_header(image_width, image_height, &mut file)?;
 
     for j in 0..image_height {
@@ -54,11 +61,14 @@ fn main() -> std::io::Result<()> {
 
             let ray_direction = pixel_center - camera_center;
             let ray = Ray::new(camera_center, ray_direction);
-            let color = ray_color(&ray);
-            //let red: f64 = f64::from(i) / f64::from(image_width - 1);
-            //let green: f64 = f64::from(j) / f64::from(image_height - 1);
 
-            //let color = Color::new(red, green, red + green);
+            let color =
+                if let Some(hit_record) = sphere.intersect(&ray, Interval::new(0.0, f64::MAX)) {
+                    hit_record.color
+                } else {
+                    ray_color(&ray)
+                };
+
             ppm::write_color(&color.as_u8(), &mut file)?;
         }
     }

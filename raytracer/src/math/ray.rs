@@ -2,6 +2,7 @@ use std::ops::Add;
 
 use crate::math::Vector3f;
 
+#[derive(Debug, Clone, Copy)]
 pub struct Ray {
     pub origin: Vector3f,
     pub direction: Vector3f,
